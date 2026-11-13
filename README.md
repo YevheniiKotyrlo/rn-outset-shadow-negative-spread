@@ -1,79 +1,16 @@
-# rn-outset-shadow-negative-spread
+# Android: an outset `boxShadow` whose negative spread empties its shape paints a bar outside the view
 
-![Build](https://github.com/YevheniiKotyrlo/rn-outset-shadow-negative-spread/workflows/Pre%20Merge%20Checks/badge.svg)
+React Native 0.90.0-nightly-20261113-6d587e873, from the [React Native reproducer template](https://github.com/react-native-community/reproducer-react-native). `App.tsx` renders three 100×50 boxes on a white screen:
 
-This is your new React Native Reproducer project.
+- `boxShadow: '0 40px 0 -30px black'`: the spread takes 30 off each side, more than half the box's height, so the shadow's shape is empty and CSS paints nothing.
+- the same shadow with `borderRadius: 8`.
+- `boxShadow: '0 40px 0 -20px black'`, the control: its shape is 60×10, and it paints 10 below the box.
 
-# Reproducer TODO list
+## Steps
 
-- [x] 1. Create a new reproducer project.
-- [ ] 2. Git clone your repository locally.
-- [ ] 3. Edit the project to reproduce the failure you're seeing.
-- [ ] 4. Push your changes, so that Github Actions can run the CI.
-- [ ] 5. Make sure the repository is public and share the link with the issue you reported.
+By hand, on an Android 9 or newer device:
 
-# How to use this Reproducer
+1. Build and install the release APK: `cd ReproducerApp && yarn install && cd android && ./gradlew assembleRelease && adb install -r app/build/outputs/apk/release/app-release.apk`.
+2. Open the app. Each of the first two boxes paints a black 40×10 bar 10 below itself, where nothing should be painted; the third paints its 60×10 shape, as it should.
 
-This project has been created with `npx @react-native-community/cli init` and is a vanilla React Native app.
-
-> [!IMPORTANT]  
-> Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/set-up-your-environment) so that you have a working environment locally.
-
-## Step 1: Start the Metro Server
-
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
-
-To start Metro, run the following command from the _root_ of your React Native project:
-
-```bash
-# using npm
-npm start
-
-# OR using Yarn
-yarn start
-```
-
-## Step 2: Start your Application
-
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
-
-### For Android
-
-```bash
-# using npm
-npm run android
-
-# OR using Yarn
-yarn android
-```
-
-### For iOS
-
-First, make sure you install dependencies with:
-
-```bash
-cd ios && bundle install && bundle exec pod install
-```
-
-Then you can run the iOS app with:
-
-```bash
-# using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
-
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
-
-## Step 3: Modifying your App
-
-Now that you have successfully run the app, let's modify it.
-
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
-
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+Scripted: `./reproduce.sh`, with one Android 9 or newer device attached, builds and installs the app, takes a screenshot and counts the dark pixels in the 30 below each box. It exits 1 while a box whose spread empties its shadow shape paints anything there, 0 once neither does, and 2 when the control paints no shape or a step fails. The screenshot lands in `screenshots/`.
